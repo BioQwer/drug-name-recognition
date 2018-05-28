@@ -13,7 +13,7 @@ for data_type in data_types:
                 if token[0].isdigit():
                     tokens.append('#')
                 else:
-                    tokens.append(token.lower())
+                    tokens.append(token)
                 tags.append(tag)
             elif len(tokens) > 0:
                 xy_list.append((tokens, tags,))
@@ -44,20 +44,26 @@ model_params = {"filter_width": 7,
                 "n_filters": [
                     128, 128,
                 ],
-                "token_embeddings_dim": 2,
-                "char_embeddings_dim": 250,
+                "token_embeddings_dim": 4,
+                "char_embeddings_dim": 50,
                 "use_batch_norm": True,
                 "use_crf": True,
                 "net_type": 'cnn',
                 "use_capitalization": True,
                }
 
-net = NER(corp, **model_params)
+net = NER(corp,**model_params)
 
-learning_params = {'dropout_rate': 0.5,
-                   'epochs': 5,
-                   'learning_rate': 0.005,
-                   'batch_size': 8,
-                   'learning_rate_decay': 0.707}
-results = net.fit(**learning_params)
-NER.save(net,"C:\\Users\\BioQwer\\Documents\\Development\\ner\\drug_model\\drug_model_lower")
+NER.load(net,"C:\\Users\\BioQwer\\Documents\\Development\\ner\\drug_model\\drug_model")
+
+
+from ner.utils import tokenize, lemmatize
+
+
+def print_predict(sentence, network):
+    # Split sentence into tokens
+    tokens = tokenize(sentence.lower())
+    print(tokens)
+    tags = network.predict_for_token_batch([tokens])[0]
+    for token, tag in zip(tokens, tags):
+        print(token, tag)
